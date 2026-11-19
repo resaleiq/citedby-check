@@ -1,6 +1,6 @@
 {
   "name": "citedby-check",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Check whether AI-search crawlers can read your site, from the terminal or a GitHub Action. Free, no account, no API key.",
   "keywords": [
     "ai-search",
@@ -14,7 +14,7 @@
     "github-action",
     "cli"
   ],
-  "homepage": "https://citedby.eu/free-ai-visibility-check",
+  "homepage": "https://citedby.eu",
   "bugs": {
     "url": "https://github.com/resaleiq/citedby-check/issues"
   },

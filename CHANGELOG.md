@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Published on npm: `npx citedby-check example.com` (before, only `npx github:resaleiq/citedby-check`).
+- `homepage` is https://citedby.eu.
+
 ## 0.1.1
 
 - A robots.txt that answers a server error (HTTP 500 to 599) is now reported as Fix: RFC 9309 says a crawler must then assume the whole site is disallowed. Before, it read as "No robots.txt found, so nothing is blocked". One that could not be loaded at all is Not checked.

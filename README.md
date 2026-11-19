@@ -3,7 +3,7 @@
 Check whether AI-search crawlers can read your site, from a terminal or a GitHub Action. Free. No account or API key.
 
 ```
-$ npx github:resaleiq/citedby-check example.com
+$ npx citedby-check example.com
 AI-search readiness check for example.com
 citedby.eu loaded the site from outside: plain HTTP, no JavaScript.
 
@@ -39,13 +39,13 @@ Output of a real run on example.com. The command exits with 1 because two checks
 ## Run it
 
 ```sh
-npx github:resaleiq/citedby-check example.com
+npx citedby-check example.com
 ```
 
-You need Node 18 or newer and git. The package is not on the npm registry yet, so the command runs straight from GitHub. To keep it installed:
+You need Node 18 or newer. To keep it installed:
 
 ```sh
-npm install -g github:resaleiq/citedby-check
+npm install -g citedby-check
 citedby-check example.com
 ```
 
