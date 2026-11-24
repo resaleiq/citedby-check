@@ -140,9 +140,9 @@ export function buildFix({ info, home, routes, url, before, date }) {
   if (check.length) notes.push(`- Lines to look at before you merge, because they read like live or sample data that will not update in the copy: ${check.map(code).join(', ')}. Delete from the block what should not be frozen.`);
   if (isPlatformHost(origin)) notes.push(`- The sitemap, robots.txt and Organization data use the address ${code(`${origin}/`)}. If the site also runs on a domain of your own, run the command with that address instead, so these lines point to it.`);
   const org = jsonLd && jsonLd['@graph'][0];
-  const orgFields = org ? [['name', org.name], ['url', org.url], ['description', org.description && `${org.description} (from the ${desc.from})`], ['logo', org.logo], ['email', org.email], ['telephone', org.telephone], ['sameAs', org.sameAs && org.sameAs.join(' , ')]].filter(([, v]) => v) : [];
+  const orgFields = org ? [['name', org.name], ['url', org.url], ['description', org.description], ['logo', org.logo], ['email', org.email], ['telephone', org.telephone], ['sameAs', org.sameAs && org.sameAs.join(' , ')]].filter(([, v]) => v) : [];
   const orgLine = jsonLd
-    ? `- The head of \`index.html\` gets Organization data (JSON-LD) with these values, all read from the page: ${orgFields.map(([k, v]) => `${k} ${code(v)}`).join('; ')}. Please check each one and correct what is off.`
+    ? `- The head of \`index.html\` gets Organization data (JSON-LD) with these values, all read from the page: ${orgFields.map(([k, v]) => `${k} ${code(v)}${k === 'description' ? ` (the ${desc.from})` : ''}`).join('; ')}. Please check each one and correct what is off.`
     : '- `index.html` already has Organization data, so none is added.';
   const files = plan.map((f) => `- \`${f.path}\`: ${f.action === 'keep' ? 'not touched' : f.action === 'add' ? 'new' : 'changed'}, ${f.why}`).join('\n');
   const routeSummary = routes.length ? `${routes.length === 1 ? 'the other page' : `the ${routes.length} other pages`} (${routes.map((r) => `\`${r.path}\``).join(', ')})` : 'no other page, because the site has one';

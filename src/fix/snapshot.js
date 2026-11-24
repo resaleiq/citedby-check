@@ -142,16 +142,15 @@ export function isProfileUrl(href) {
   return seg.length === 1 && !/^(watch|embed|share|search|explore|hashtag|home|login|signup|p|reel|status)$/i.test(seg[0]);
 }
 
+const SAYS_SAMPLE = /\b(sample|samples|demo data|lorem|placeholder|coming soon)\b/i;
 const CHECK_LINE = /\b(sample|samples|demo data|lorem|placeholder|coming soon|open now|closed now|in stock|out of stock|sold out|today|yesterday|tomorrow)\b|\b\d+\s*(units?|left|online|viewers?)\b|\b\d+\s*(min|mins|minutes|hours?|days?)\s+ago\b/i;
 
 /** Lines in the copy that look like live or sample data: the owner should look at these before merging. */
 export function linesToCheck(blocks, max = 8) {
-  const out = [];
-  for (const b of blocks || []) {
-    if (CHECK_LINE.test(b.text) && !out.includes(b.text)) out.push(b.text);
-    if (out.length >= max) break;
-  }
-  return out;
+  const hits = [];
+  for (const b of blocks || []) if (CHECK_LINE.test(b.text) && !hits.includes(b.text)) hits.push(b.text);
+  const says = hits.filter((t) => SAYS_SAMPLE.test(t)); // a line that calls the data a sample comes first
+  return [...says, ...hits.filter((t) => !says.includes(t))].slice(0, max);
 }
 
 const PLATFORM_HOST = /\.(vercel\.app|netlify\.app|lovable\.app|lovableproject\.com|pages\.dev|web\.app|github\.io|bolt\.host|v0\.app|onrender\.com)$/i;

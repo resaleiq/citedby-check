@@ -53,7 +53,7 @@ test('Organization data uses only what was read: no default icon as logo, no sha
   assert.equal(org.email, 'hi@acme.example');
   assert.equal(ld['@graph'][1].publisher['@id'], org['@id']);
   assert.deepEqual(['https://github.com/acme', 'https://github.com/someone/repo', 'https://www.youtube.com/watch?v=1', 'https://www.youtube.com/@acme', 'https://x.com/acme', 'https://www.instagram.com/p/abc', 'https://www.linkedin.com/in/jo'].filter(isProfileUrl), ['https://github.com/acme', 'https://www.youtube.com/@acme', 'https://x.com/acme', 'https://www.linkedin.com/in/jo']);
-  assert.deepEqual(linesToCheck([{ text: 'Open Now' }, { text: '120 units' }, { text: 'Above data are just samples.' }, { text: 'Real-time availability' }, { text: 'Posted 3 days ago' }]), ['Open Now', '120 units', 'Above data are just samples.', 'Posted 3 days ago']);
+  assert.deepEqual(linesToCheck([{ text: 'Open Now' }, { text: '120 units' }, { text: 'Above data are just samples.' }, { text: 'Real-time availability' }, { text: 'Posted 3 days ago' }]), ['Above data are just samples.', 'Open Now', '120 units', 'Posted 3 days ago']);
   assert.deepEqual([isPlatformHost('https://x.vercel.app'), isPlatformHost('https://acme.example')], [true, false]);
   assert.match(sitemapXml(HOME.origin, ['/pricing']), /<loc>https:\/\/acme\.example\/<\/loc>[\s\S]*<loc>https:\/\/acme\.example\/pricing<\/loc>/);
   assert.match(llmsTxt({ home: HOME, origin: HOME.origin, routes: [{ path: '/pricing', text: 'Pricing' }] }), /^# Acme Tools\n\n> Acme Tools helps[\s\S]*- \[Pricing\]\(https:\/\/acme\.example\/pricing\)\n$/);

@@ -77,7 +77,7 @@ test('a dry run changes nothing; --write writes index.html and the missing files
   const md = readFileSync(body, 'utf8');
   assert.match(md, /reads \*\*0 words\*\* of text\. A browser shows about 40\./);
   assert.match(md, /`public\/robots\.txt`: new/);
-  assert.match(md, /Organization data \(JSON-LD\) with these values, all read from the page: name `Acme Tools`; url `https:\/\/acme\.example\/`; description `Acme Tools helps[^`]+\(from the first paragraph of the home page\)`; email `hi@acme\.example`; sameAs `https:\/\/www\.linkedin\.com\/company\/acme`\./);
+  assert.match(md, /Organization data \(JSON-LD\) with these values, all read from the page: name `Acme Tools`; url `https:\/\/acme\.example\/`; description `Acme Tools helps[^`]+` \(the first paragraph of the home page\); email `hi@acme\.example`; sameAs `https:\/\/www\.linkedin\.com\/company\/acme`\./);
 
   // A second run is a refresh: the Organization data the first run wrote is written again, not dropped.
   const again = JSON.parse((await run([dir, '--url', 'https://acme.example', '--write', '--json'])).stdout);
