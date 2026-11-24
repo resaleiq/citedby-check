@@ -186,6 +186,10 @@ The address, the language code and the tag (`cli`, or `action` in the Action) go
 
 citedby.eu checks sites from outside, so `localhost`, private network addresses and pages behind a login cannot be checked.
 
+## The same question for each crawler, in a browser
+
+This check loads your home page once. To see, crawler by crawler, what your robots.txt says and what your server answered for GPTBot, OAI-SearchBot, ChatGPT-User, PerplexityBot, ClaudeBot, Google-Extended, Bingbot and Googlebot, use [the AI crawler check](https://citedby.eu/tools/ai-crawler-check?utm_source=github&utm_medium=referral&utm_campaign=citedbycheck_202610&utm_content=readme_crawler_tool). It is free, needs no account, and puts the date of the check on the result.
+
 ## What it does not tell you
 
 A pass means a crawler can read the pages the check loads. It does not say that an AI assistant will mention or cite your site, and it covers the home page and at most one product page.
