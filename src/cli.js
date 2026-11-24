@@ -4,6 +4,10 @@ import { renderText, reasonText } from './render.js';
 
 /** Runs the CLI and returns the exit code. Streams and env are injected so tests never touch the real ones. */
 export async function main(argv, { env = process.env, stdout = process.stdout, stderr = process.stderr, fetchImpl } = {}) {
+  if (argv[0] === 'fix') {
+    const { fixMain } = await import('./fix/cli.js');
+    return fixMain(argv.slice(1), { env, stdout, stderr, ...(fetchImpl ? { fetchImpl } : {}) });
+  }
   let args;
   try {
     args = parseArgs(argv, env);

@@ -5,6 +5,7 @@ export class UsageError extends Error {}
 export const HELP = `citedby-check: AI-search readiness check for a public website
 
 Usage: citedby-check <address> [options]
+       citedby-check fix <folder> --url <live site>   put a JavaScript-only site's text into its index.html (fix --help)
 
 Asks citedby.eu to load the address from outside (plain HTTP, no JavaScript) and
 reports, with the fix for each problem: whether robots.txt lets AI-search crawlers
