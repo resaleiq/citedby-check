@@ -112,7 +112,7 @@ export function staticHtml({ home, routes = [], routeWords = 60 }) {
   }
   lines.push('</main>');
   if (footer.length) lines.push('<footer>', ...renderBlocks(footer, { demote: true }), '</footer>');
-  return { html: lines.join('\n'), routeSections, name };
+  return { html: lines.join('\n'), routeSections, name, kept: [...main, ...footer] };
 }
 
 /** The description to use: the meta description when it says something, else the first full sentence of the page. */
@@ -127,12 +127,42 @@ export function describe(home) {
 const DEFAULT_ICON = /\/(vite\.svg|placeholder\.svg|favicon\.ico)$/i;
 const SHARE_LINK = /\/(share|sharer|intent)\b|[?&](u|url|text)=/i;
 
+/** A link to the organisation's own profile, not to a video, a post or somebody's repository. */
+export function isProfileUrl(href) {
+  let u;
+  try { u = new URL(href); } catch { return false; }
+  if (SHARE_LINK.test(href)) return false;
+  const host = u.hostname.replace(/^www\./, '').toLowerCase();
+  const seg = u.pathname.split('/').filter(Boolean);
+  if (!seg.length) return false;
+  if (host === 'youtube.com') return seg[0].startsWith('@') || (['channel', 'c', 'user'].includes(seg[0]) && seg.length === 2);
+  if (host === 'linkedin.com') return ['company', 'in', 'school', 'showcase'].includes(seg[0]) && seg.length === 2;
+  if (host === 'producthunt.com') return (seg[0] === 'products' && seg.length === 2) || seg[0].startsWith('@');
+  if (host === 'discord.com') return seg[0] === 'invite' && seg.length === 2;
+  return seg.length === 1 && !/^(watch|embed|share|search|explore|hashtag|home|login|signup|p|reel|status)$/i.test(seg[0]);
+}
+
+const CHECK_LINE = /\b(sample|samples|demo data|lorem|placeholder|coming soon|open now|closed now|in stock|out of stock|sold out|today|yesterday|tomorrow)\b|\b\d+\s*(units?|left|online|viewers?)\b|\b\d+\s*(min|mins|minutes|hours?|days?)\s+ago\b/i;
+
+/** Lines in the copy that look like live or sample data: the owner should look at these before merging. */
+export function linesToCheck(blocks, max = 8) {
+  const out = [];
+  for (const b of blocks || []) {
+    if (CHECK_LINE.test(b.text) && !out.includes(b.text)) out.push(b.text);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+const PLATFORM_HOST = /\.(vercel\.app|netlify\.app|lovable\.app|lovableproject\.com|pages\.dev|web\.app|github\.io|bolt\.host|v0\.app|onrender\.com)$/i;
+export const isPlatformHost = (origin) => { try { return PLATFORM_HOST.test(new URL(origin).hostname); } catch { return false; } };
+
 export function orgJsonLd({ home, origin }) {
   const name = brandName(home);
   const url = `${origin}/`;
   const desc = describe(home).text;
   const icon = (home.icons || []).find((i) => !DEFAULT_ICON.test(i.href) && i.href.startsWith(origin));
-  const sameAs = (home.sameAs || []).filter((u) => !SHARE_LINK.test(u)).map((u) => u.split('?')[0]).filter((u, i, a) => a.indexOf(u) === i);
+  const sameAs = (home.sameAs || []).filter(isProfileUrl).map((u) => u.split('?')[0]).filter((u, i, a) => a.indexOf(u) === i);
   const org = { '@type': 'Organization', '@id': `${url}#organization`, name, url };
   if (desc) org.description = desc;
   if (icon) org.logo = icon.href;

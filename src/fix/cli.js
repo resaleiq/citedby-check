@@ -7,8 +7,8 @@ import { join, relative, resolve } from 'node:path';
 import { REPO_URL, VERSION } from '../check.js';
 import { openBrowser } from './chrome.js';
 import { openPullRequest, PrError, refusal } from './pr.js';
-import { applyPlan, blockedBots, inspectRepo, patchIndexHtml, planFiles } from './repo.js';
-import { describe, llmsTxt, looksNotFound, orgJsonLd, pickRoutes, robotsTxt, sitemapXml, staticHtml } from './snapshot.js';
+import { applyPlan, blockedBots, inspectRepo, patchIndexHtml, planFiles, stripFixBlocks } from './repo.js';
+import { describe, isPlatformHost, linesToCheck, llmsTxt, looksNotFound, orgJsonLd, pickRoutes, robotsTxt, sitemapXml, staticHtml } from './snapshot.js';
 import { countWords, hasOrgData, textLevel } from './words.js';
 
 export const FIX_HELP = `citedby-check fix: put a JavaScript-only site's text where a plain request can read it
@@ -117,8 +117,8 @@ function fill(template, values) {
 /** Builds the whole result from what was read. Pure: no network, no disk writes. */
 export function buildFix({ info, home, routes, url, before, date }) {
   const origin = home.origin;
-  const { html, routeSections, name } = staticHtml({ home, routes });
-  const needsOrg = !hasOrgData(info.indexHtml);
+  const { html, routeSections, name, kept } = staticHtml({ home, routes });
+  const needsOrg = !hasOrgData(stripFixBlocks(info.indexHtml)); // data an earlier run of the fix wrote is ours to write again
   const jsonLd = needsOrg ? orgJsonLd({ home, origin }) : null;
   const note = `text read from ${origin}/ on ${date} by citedby-check fix; React replaces this block when the app starts. After a text change, run citedby-check fix again (https://github.com/resaleiq/citedby-check)`;
   const indexHtml = patchIndexHtml(info.indexHtml, { staticInner: html, jsonLd, note });
@@ -135,9 +135,14 @@ export function buildFix({ info, home, routes, url, before, date }) {
   const notes = [];
   if (blocked.length) notes.push(`- Your robots.txt shuts out ${blocked.join(', ')}. This pull request leaves your rules as they are; those crawlers will not read the new text until you let them in.`);
   if (after < 200) notes.push(`- The site shows ${home.renderedWords} words in a browser. The block holds what is there; it does not add text the site does not have.`);
+  const check = linesToCheck(kept);
+  const code = (s) => `\`${String(s).replace(/`/g, "'")}\``;
+  if (check.length) notes.push(`- Lines to look at before you merge, because they read like live or sample data that will not update in the copy: ${check.map(code).join(', ')}. Delete from the block what should not be frozen.`);
+  if (isPlatformHost(origin)) notes.push(`- The sitemap, robots.txt and Organization data use the address ${code(`${origin}/`)}. If the site also runs on a domain of your own, run the command with that address instead, so these lines point to it.`);
   const org = jsonLd && jsonLd['@graph'][0];
+  const orgFields = org ? [['name', org.name], ['url', org.url], ['description', org.description && `${org.description} (from the ${desc.from})`], ['logo', org.logo], ['email', org.email], ['telephone', org.telephone], ['sameAs', org.sameAs && org.sameAs.join(' , ')]].filter(([, v]) => v) : [];
   const orgLine = jsonLd
-    ? `- The head of \`index.html\` gets Organization data (JSON-LD): name "${org.name}", address ${org.url}${org.description ? `, and a description taken from the ${desc.from}` : ''}${org.logo ? ', your icon as logo' : ''}${org.sameAs ? `, ${org.sameAs.length} profile link${org.sameAs.length > 1 ? 's' : ''} found on the page` : ''}. Please check these values and correct what is off.`
+    ? `- The head of \`index.html\` gets Organization data (JSON-LD) with these values, all read from the page: ${orgFields.map(([k, v]) => `${k} ${code(v)}`).join('; ')}. Please check each one and correct what is off.`
     : '- `index.html` already has Organization data, so none is added.';
   const files = plan.map((f) => `- \`${f.path}\`: ${f.action === 'keep' ? 'not touched' : f.action === 'add' ? 'new' : 'changed'}, ${f.why}`).join('\n');
   const routeSummary = routes.length ? `${routes.length === 1 ? 'the other page' : `the ${routes.length} other pages`} (${routes.map((r) => `\`${r.path}\``).join(', ')})` : 'no other page, because the site has one';
@@ -215,6 +220,7 @@ export async function fixMain(argv, { env = process.env, stdout = process.stdout
     originUrl = (await sh('git', ['remote', 'get-url', 'origin'], root)).stdout;
     const no = refusal({ repo: a.repo, consent: a.consent, originUrl });
     if (no) { stderr.write(`citedby-check fix: ${no}\n`); return 2; }
+    if ((await sh('git', ['rev-parse', '--verify', '--quiet', `refs/heads/${a.branch}`], root)).code === 0) { stderr.write(`citedby-check fix: the branch ${a.branch} already exists here. Delete it or pass --branch with another name.\n`); return 1; }
     if ((await sh('git', ['status', '--porcelain'], root)).stdout) { stderr.write('citedby-check fix: the checkout has uncommitted changes. Commit or remove them first, so the pull request holds only the fix.\n'); return 1; }
   }
 
@@ -255,12 +261,12 @@ export async function fixMain(argv, { env = process.env, stdout = process.stdout
     try {
       pr = await pullRequest({
         dir: relative(root, dir), root, repo: a.repo, base: a.base, branch: a.branch, title: res.title, bodyFile, files: written, consent: a.consent, env,
-        message: `${res.title}\n\nText read from ${res.site} on ${res.date} with citedby-check fix. Files: ${written.join(', ')}.`,
+        message: `${res.title}\n\nText read from ${res.site} on ${res.date} with citedby-check fix. Files: ${written.join(', ')}.${a.consent.trim().toLowerCase() === 'own' ? '' : `\n\nOpened at the owner's request: ${a.consent.trim()}`}`,
       });
       mode = 'pr';
     } catch (e) {
       if (!(e instanceof PrError)) throw e;
-      stderr.write(`citedby-check fix: ${e.message}\n`);
+      stderr.write(`citedby-check fix: ${e.message}\nThe files are written in ${dir}; look at \`git status\` there before you try again.\n`);
       return 1;
     }
   }

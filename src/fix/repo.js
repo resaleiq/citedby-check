@@ -87,6 +87,11 @@ function stripBetween(html, start, end) {
   }
 }
 
+/** index.html without the blocks an earlier run of the fix wrote: what the owner's own file holds. */
+export function stripFixBlocks(html) {
+  return stripBetween(stripBetween(String(html ?? ''), HEAD_START, HEAD_END), BODY_START, BODY_END);
+}
+
 const NO_FLASH = [
   '<script>document.documentElement.classList.add("citedby-js")</script>',
   '<style>#citedby-static{max-width:44rem;margin:0 auto;padding:1.5rem;font:16px/1.6 system-ui,sans-serif}.citedby-js #citedby-static{visibility:hidden;animation:citedby-show 0s 6s forwards}@keyframes citedby-show{to{visibility:visible}}</style>',
@@ -97,7 +102,7 @@ const NO_FLASH = [
  * staticInner: HTML for the block; jsonLd: object or null; note: one line for the comment (where and when the text was read).
  */
 export function patchIndexHtml(html, { staticInner, jsonLd = null, note = '' }) {
-  let out = stripBetween(stripBetween(html, HEAD_START, HEAD_END), BODY_START, BODY_END);
+  let out = stripFixBlocks(html);
   const nl = out.includes('\r\n') ? '\r\n' : '\n';
   const indent = (s, pad) => s.split('\n').map((l) => (l ? pad + l : l)).join(nl);
   const head = [HEAD_START, ...NO_FLASH];
