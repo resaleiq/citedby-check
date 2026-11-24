@@ -65,6 +65,55 @@ If your firewall turns the checker away, the result says your site refused the r
 
 A robots.txt that does not answer in time is reported as Not checked, never as OK.
 
+## Fix a JavaScript-only site
+
+Sites exported from Lovable, Bolt or v0 are Vite + React apps: the HTML a crawler receives is an empty `<div id="root">`, and the text arrives with JavaScript. `citedby-check fix` puts that text into `index.html`.
+
+```
+$ citedby-check fix ./my-site --url https://my-site.example
+Fix for https://my-site.example/ (Hospital Hub)
+
+  Plain request today      2 words
+  In a browser             419 words
+  index.html with the fix  405 words (OK: 200 or more)
+
+  Routes read: /hospitals, /blood-bank, /health-news
+
+  change  index.html  (the text of the site inside `<div id="root">`, and Organization data in the head)
+  add     public/sitemap.xml  (the pages of the site, for crawlers)
+  add     public/robots.txt  (lets every crawler in and names the sitemap)
+  add     public/llms.txt  (a short plain-text list of the pages (optional file))
+
+Nothing was changed. Add --write to write the files, or --pr to open a pull request.
+```
+
+Numbers from a real run on 24 Nov 2026 (the address is replaced). The same run as a pull request, with the text it wrote: [citedby-check-test-lovable-export#1](https://github.com/resaleiq/citedby-check-test-lovable-export/pull/1).
+
+How it works:
+
+- It opens the live site in a headless Chrome on your machine (Chrome, Chromium or Edge; or set `CHROME_PATH`) and reads the text a visitor sees on the home page and up to 8 routes. The browser identifies itself with `CitedBot/1.0 (+https://citedby.eu/bot)`.
+- The text goes inside `<div id="root">`. React replaces everything in that element when the app starts, so visitors get the same site. While the app loads the block is hidden; if the scripts never load, it shows after 6 seconds.
+- `public/robots.txt`, `public/sitemap.xml` and `public/llms.txt` are added only where the repository has none. An existing `robots.txt` keeps its rules. Organization data (JSON-LD) is added when `index.html` has none.
+- Every word comes from the site. Nothing is written for it.
+
+Limits:
+
+- A single-page app serves the same `index.html` for every address, so the block describes the whole site: the home page in full, and the heading and intro of each route.
+- The block is a copy. Run the command again after the text of the site changes.
+- It applies to Vite + React apps that start with `createRoot`. It refuses an app that hydrates server-rendered HTML.
+- Sites hosted by Lovable are built by Lovable from the repository. We have not yet tested what that build keeps.
+
+```
+citedby-check fix <folder> --url <live site>     dry run: what it read and what it would write
+citedby-check fix <folder> --url <site> --write  write the files
+citedby-check fix <folder> --url <site> --pr --repo owner/name --consent <ref>
+                                                 commit on a new branch, push, open the pull request (git and gh)
+citedby-check fix --count <index.html or build folder>
+                                                 count the words a plain request reads
+```
+
+`--pr` opens a pull request only on the repository named with `--repo`, which must be the checkout's own `origin`, and only with `--consent`: where the owner said yes, or `own` for a repository of your own. With `GH_TOKEN` set, the push uses that token.
+
 ## Options
 
 ```
