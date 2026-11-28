@@ -28,7 +28,7 @@ could not be measured (rate limit, your site refused or did not answer, no answe
 
 Sent to citedby.eu: the address, the language code and the source tag. Nothing else.
 Private and local addresses (localhost, 10.x, 192.168.x) cannot be checked from outside.
-https://github.com/resaleiq/citedby-check
+https://github.com/citedby-eu/citedby-check
 `;
 
 const FAIL_ON = ['fail', 'warn', 'never'];

@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 
 export const VERSION = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
 export const DEFAULT_API = 'https://citedby.eu/api/check';
-export const REPO_URL = 'https://github.com/resaleiq/citedby-check';
+export const REPO_URL = 'https://github.com/citedby-eu/citedby-check';
 export const LANGS = ['en', 'fr', 'de', 'es', 'nl'];
 
 const COUNTED = new Set(['pass', 'fail', 'warn']);

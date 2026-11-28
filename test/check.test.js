@@ -10,7 +10,7 @@ test('the request is a JSON POST to citedby.eu/api/check with the address, langu
   assert.equal(r.init.method, 'POST');
   assert.equal(r.init.headers['content-type'], 'application/json');
   assert.deepEqual(JSON.parse(r.init.body), { url: 'example.com', lang: 'de', source: 'cli' });
-  assert.match(r.init.headers['user-agent'], new RegExp(`^citedby-check/${VERSION.replace(/\./g, '\\.')} \\(\\+https://github\\.com/resaleiq/citedby-check\\)$`));
+  assert.match(r.init.headers['user-agent'], new RegExp(`^citedby-check/${VERSION.replace(/\./g, '\\.')} \\(\\+https://github\\.com/citedby-eu/citedby-check\\)$`));
 });
 
 test('summarize counts like the web page: na, info and unknown are not counted', () => {

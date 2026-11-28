@@ -26,13 +26,13 @@ This pull request puts the text of the site into `index.html`. Counted the same 
 Once a preview or the deploy is up:
 
 ```sh
-npx github:resaleiq/citedby-check <address of the preview or the site>
+npx github:citedby-eu/citedby-check <address of the preview or the site>
 ```
 
 Refresh the copy after a text change (run in the folder that holds `index.html`):
 
 ```sh
-npx github:resaleiq/citedby-check fix . --url {{site}} --write
+npx github:citedby-eu/citedby-check fix . --url {{site}} --write
 ```
 
 ## Undo
