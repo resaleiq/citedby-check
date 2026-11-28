@@ -16,11 +16,11 @@
   ],
   "homepage": "https://citedby.eu/free-ai-visibility-check",
   "bugs": {
-    "url": "https://github.com/resaleiq/citedby-check/issues"
+    "url": "https://github.com/citedby-eu/citedby-check/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/resaleiq/citedby-check.git"
+    "url": "git+https://github.com/citedby-eu/citedby-check.git"
   },
   "license": "MIT",
   "author": "CitedBy <hello@citedby.eu> (https://citedby.eu)",

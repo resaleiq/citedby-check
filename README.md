@@ -3,7 +3,7 @@
 Check whether AI-search crawlers can read your site, from a terminal or a GitHub Action. Free. No account or API key.
 
 ```
-$ npx github:resaleiq/citedby-check example.com
+$ npx github:citedby-eu/citedby-check example.com
 AI-search readiness check for example.com
 citedby.eu loaded the site from outside: plain HTTP, no JavaScript.
 
@@ -39,13 +39,13 @@ Output of a real run on example.com. The command exits with 1 because two checks
 ## Run it
 
 ```sh
-npx github:resaleiq/citedby-check example.com
+npx github:citedby-eu/citedby-check example.com
 ```
 
 You need Node 18 or newer and git. The package is not on the npm registry yet, so the command runs straight from GitHub. To keep it installed:
 
 ```sh
-npm install -g github:resaleiq/citedby-check
+npm install -g github:citedby-eu/citedby-check
 citedby-check example.com
 ```
 
@@ -87,7 +87,7 @@ Fix for https://my-site.example/ (Hospital Hub)
 Nothing was changed. Add --write to write the files, or --pr to open a pull request.
 ```
 
-Numbers from a real run on 24 Nov 2026 (the address is replaced). The same run as a pull request, with the text it wrote: [citedby-check-test-lovable-export#1](https://github.com/resaleiq/citedby-check-test-lovable-export/pull/1).
+Numbers from a real run on 24 Nov 2026 (the address is replaced). The same run as a pull request, with the text it wrote: [citedby-check-test-lovable-export#1](https://github.com/citedby-eu/citedby-check-test-lovable-export/pull/1).
 
 How it works:
 
@@ -159,7 +159,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: resaleiq/citedby-check@v0
+      - uses: citedby-eu/citedby-check@v0
         with:
           url: https://example.com
 ```
@@ -205,7 +205,7 @@ The full audit crawls your site up to your plan's page limit and gives the exact
 ## Development
 
 ```sh
-git clone https://github.com/resaleiq/citedby-check
+git clone https://github.com/citedby-eu/citedby-check
 cd citedby-check
 npm test
 ```
